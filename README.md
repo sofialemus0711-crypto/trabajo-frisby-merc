@@ -7,7 +7,7 @@ literalmente en el guion de las ocho escenas (incluida la campaña **“Frisby n
 
 | Archivo | Para qué sirve |
 |---|---|
-| `salida/animatic_frisby.mp4` | Animatic 1920×1080 (≈ 5 min 33 s) **con voces y música de fondo**: las 8 escenas en orden, cada diálogo completo en pantalla con la compañera que lo dice, imágenes de apoyo y diagramas de los conceptos (sin cifras inventadas). Sirve como guía de montaje y de tiempos, o como entrega si se le añaden las voces. |
+| `salida/animatic_frisby.mp4` | Animatic 1920×1080 (≈ 5 min 38 s) **con voces y música de fondo**: las 8 escenas en orden, cada diálogo completo en pantalla con la compañera que lo dice, imágenes de apoyo, diagramas de los conceptos (sin cifras inventadas) y cierre con el logotipo oficial a pantalla completa. Sirve como guía de montaje y de tiempos, o como entrega si se le añaden las voces. |
 | `salida/clips/` (y `salida/clips_frisby.zip`) | El animatic cortado en 56 clips con voz, uno por bloque de diálogo, numerados igual que en `PROMPTS_POR_CLIP.md` (`clip_NN_escenaE_HABLANTE.mp4`). |
 | `salida/voces/` | Voz de cada bloque (`voz_NN.wav`), sintetizada con Kokoro: una voz distinta por compañera y las tres mezcladas en los eslóganes. |
 | `salida/musica_fondo.m4a` | Pista instrumental original (compuesta por `produccion/generar_musica.py`, sin derechos de terceros), por si se quiere usar en otro montaje. En el animatic va por debajo de las voces y baja sola cuando alguien habla. |

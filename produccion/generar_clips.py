@@ -7,7 +7,7 @@ Salida: salida/clips/clip_NN_escenaE_HABLANTE.mp4
 import os
 import subprocess
 
-from generar_animatic import CIERRE_SEG, SALIDA, TITULO_SEG
+from generar_animatic import SALIDA, TITULO_SEG
 from linea_tiempo import linea_de_tiempo
 
 PORTADA_SEG = 4.0

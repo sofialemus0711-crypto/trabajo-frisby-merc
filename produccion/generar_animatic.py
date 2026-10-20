@@ -29,7 +29,10 @@ BLANCO = (255, 255, 255)
 GRIS = (90, 90, 90)
 
 TITULO_SEG = 2.6     # tarjeta de título de cada escena
-CIERRE_SEG = 4.0     # plano final sostenido
+CIERRE_SEG = 3.0     # tarjeta con el eslogan final
+LOGO_SEG = 5.0       # logotipo oficial a pantalla completa, plano final sostenido
+TRANSICION_SEG = 0.8 # fundido entre el eslogan y el logotipo
+FONDO_LOGO = (242, 203, 37)  # amarillo exacto del fondo del logotipo
 
 F = "/usr/share/fonts/truetype/liberation/"
 def fuente(t, negrita=True):
@@ -327,6 +330,19 @@ def fotograma_portada():
     return im
 
 
+def fotograma_logo():
+    im = Image.new("RGB", (W, H), FONDO_LOGO)
+    logo = Image.open(os.path.join(RAIZ, "assets/logo_mascota.jpg")).convert("RGB")
+    lado = 960
+    # bordes difuminados para que el recuadro de la imagen no se note sobre el fondo
+    borde = 60
+    mascara = Image.new("L", (lado, lado), 0)
+    ImageDraw.Draw(mascara).rectangle((borde, borde, lado - borde, lado - borde), fill=255)
+    mascara = mascara.filter(ImageFilter.GaussianBlur(borde / 2))
+    im.paste(logo.resize((lado, lado), Image.LANCZOS), ((W - lado) // 2, (H - lado) // 2), mascara)
+    return im
+
+
 def fotograma_cierre():
     im, d = lienzo()
     pegar_imagen(im, "assets/logo_mascota.jpg", (660, 120, 1260, 720))
@@ -377,8 +393,13 @@ def main():
         srt.append(f"{len(srt) + 1}\n{tiempo_srt(t)} --> {tiempo_srt(t + dur - 0.25)}\n"
                    f"[{rol}]\n" + "\n".join(textwrap.wrap(b["texto"], 52)) + "\n")
         t += dur
-    agregar(fotograma_cierre(), CIERRE_SEG)
-    t += CIERRE_SEG
+    cierre, logo = fotograma_cierre(), fotograma_logo()
+    agregar(cierre, CIERRE_SEG)
+    pasos = int(TRANSICION_SEG * 25)
+    for k in range(1, pasos + 1):
+        agregar(Image.blend(cierre, logo, k / pasos), 1 / 25)
+    agregar(logo, LOGO_SEG)
+    t += CIERRE_SEG + pasos / 25 + LOGO_SEG
 
     with open(os.path.join(SALIDA, "subtitulos_frisby.srt"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(srt))
@@ -423,7 +444,7 @@ def main():
         "ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lista,
         *entrada_audio, "-i", musica, "-filter_complex", filtro, "-map", "0:v", "-map", "[a]",
         "-t", f"{t:.2f}", "-ar", "48000",
-        "-vf", "fps=25,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+        "-vf", f"fps=25,fade=t=out:st={t - 1.2:.2f}:d=1.2,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
         "-tune", "stillimage", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", mp4,
     ], check=True)
     shutil.rmtree(TMP)
