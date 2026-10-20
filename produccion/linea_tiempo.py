@@ -3,9 +3,14 @@
 Los cortes solo se hacen entre oraciones o en comas/puntos y comas: el texto
 unido de nuevo es exactamente el párrafo original.
 """
+import json
+import os
 import re
 
 from guion_data import ESCENAS
+
+DURACIONES_VOZ = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                              "salida", "voces", "duraciones.json")
 
 PALABRAS_POR_SEGUNDO = 2.5   # ritmo natural de habla, sin acelerar
 PAUSA = 0.7                  # pausa natural después de cada bloque
@@ -56,15 +61,24 @@ def duracion(texto):
     return round(max(2.2, _palabras(texto) / PALABRAS_POR_SEGUNDO) + PAUSA, 2)
 
 
-def linea_de_tiempo():
-    """Lista de bloques con escena, hablante, texto, visual, apoyo, inicio y fin."""
+def linea_de_tiempo(usar_voces=True):
+    """Lista de bloques con escena, hablante, texto, visual, apoyo, inicio y fin.
+
+    Si existen voces generadas (generar_voces.py), cada bloque dura lo que dura
+    su voz más la pausa; si no, se estima por número de palabras.
+    """
+    voces = {}
+    if usar_voces and os.path.exists(DURACIONES_VOZ):
+        with open(DURACIONES_VOZ) as fh:
+            voces = json.load(fh)
     t = 0.0
     bloques = []
     for esc in ESCENAS:
         for i_par, (quien, texto, visual, apoyo) in enumerate(esc["parrafos"]):
             partes = dividir(texto)
             for i, parte in enumerate(partes):
-                d = duracion(parte)
+                n = len(bloques) + 1
+                d = round(voces[str(n)] + PAUSA, 2) if voces else duracion(parte)
                 bloques.append({
                     "escena": esc["num"], "titulo": esc["titulo"], "parrafo": i_par,
                     "quien": quien, "texto": parte, "visual": visual, "apoyo": apoyo,

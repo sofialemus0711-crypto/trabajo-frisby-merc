@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import textwrap
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 from guion_data import ESCENAS, PERSONAJES, TITULO
@@ -350,6 +351,9 @@ def main():
 
     secuencia = []  # (ruta_png, duracion)
     srt = []
+    voces_dir = os.path.join(SALIDA, "voces")
+    con_voz = os.path.exists(os.path.join(voces_dir, "duraciones.json"))
+    pistas = []  # (inicio_s, ruta_wav)
 
     def agregar(im, dur):
         ruta = os.path.join(TMP, f"{len(secuencia):03}.png")
@@ -367,6 +371,8 @@ def main():
             t += TITULO_SEG
         dur = round(b["fin"] - b["inicio"], 2)
         agregar(fotograma_bloque(b, escenas[b["escena"]]), dur)
+        if con_voz:
+            pistas.append((t, os.path.join(voces_dir, f"voz_{len(srt) + 1:02}.wav")))
         rol = PERSONAJES[b["quien"]]["rol"]
         srt.append(f"{len(srt) + 1}\n{tiempo_srt(t)} --> {tiempo_srt(t + dur - 0.25)}\n"
                    f"[{rol}]\n" + "\n".join(textwrap.wrap(b["texto"], 52)) + "\n")
@@ -383,12 +389,26 @@ def main():
             fh.write(f"file '{ruta}'\nduration {dur}\n")
         fh.write(f"file '{secuencia[-1][0]}'\n")  # requisito del demuxer concat
 
+    if con_voz:
+        import soundfile as sf
+        sr = sf.info(pistas[0][1]).samplerate
+        mezcla = np.zeros(int((t + 1) * sr), dtype=np.float32)
+        for inicio, ruta in pistas:
+            a, _ = sf.read(ruta, dtype="float32")
+            i = int(inicio * sr)
+            mezcla[i:i + len(a)] += a
+        audio = os.path.join(TMP, "voces.wav")
+        sf.write(audio, mezcla, sr)
+        entrada_audio = ["-i", audio]
+    else:
+        entrada_audio = ["-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo"]
+
     mp4 = os.path.join(SALIDA, "animatic_frisby.mp4")
     subprocess.run([
         "ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lista,
-        "-f", "lavfi", "-t", f"{t:.2f}", "-i", "anullsrc=r=48000:cl=stereo",
+        *entrada_audio, "-t", f"{t:.2f}", "-ar", "48000", "-ac", "2",
         "-vf", "fps=25,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-        "-tune", "stillimage", "-c:a", "aac", "-shortest", "-movflags", "+faststart", mp4,
+        "-tune", "stillimage", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", mp4,
     ], check=True)
     shutil.rmtree(TMP)
     print(f"OK: {mp4} ({t:.1f} s, {len(bloques)} bloques de diálogo)")
