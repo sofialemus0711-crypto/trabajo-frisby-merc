@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, Audio, Img, staticFile, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Audio, Img, getInputProps, staticFile, useCurrentFrame} from 'remotion';
 import '@fontsource/baloo-2/700.css';
 import '@fontsource/baloo-2/800.css';
 import '@fontsource/patrick-hand/400.css';
@@ -41,7 +41,7 @@ export const Video: React.FC = () => {
   return (
     <AbsoluteFill style={{background: '#000'}}>
       <Historia f={Math.min(f, D.total - D.logo - 1)} />
-      <Subtitulo f={f} />
+      {!(getInputProps() as any).sinTexto && <Subtitulo f={f} />}
       <CierreLogo f={f} />
       <Audio src={staticFile('audio.wav')} />
     </AbsoluteFill>

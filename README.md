@@ -3,6 +3,22 @@
 Material de producción del video para el trabajo de **Gestión de Mercadeo**, basado
 literalmente en el guion de las ocho escenas (incluida la campaña **“Frisby nos une”**).
 
+## Versión con personajes fotorrealistas (IA)
+
+Esta versión sigue el estilo de la apertura que hizo el equipo (`referencia_ia/apertura_original.mp4`).
+Toda la historia ocurre dentro de un Frisby y la actúan los personajes de esa apertura, sin texto
+en pantalla.
+
+1. Genera los clips con `PROMPTS_HISTORIA.md` en la herramienta de video con IA, usando la
+   imagen de `referencia_ia/` que indica cada clip. Guárdalos en `clips_ia/` como
+   `clip_01.mp4` … `clip_56.mp4`, más `clip_52_antes.mp4`.
+2. Ejecuta `python3 produccion/montar_historia.py`. Une los clips con las voces, la música y el logo
+   en `salida/Frisby_historia.mp4`. Opciones: `--audio-clips` usa la voz que trae cada clip,
+   y `--apertura` antepone la apertura original.
+   Mientras falten clips, el montaje rellena esos pedazos con el cortometraje animado sin texto
+   (`salida/Frisby_animado_sin_texto.mp4`, se regenera con
+   `npx remotion render FrisbyAnimado ../salida/Frisby_animado_sin_texto.mp4 --props='{"sinTexto":true}'`).
+
 ## Versión animada (cortometraje)
 
 **`salida/Frisby_animado.mp4`** es la versión principal: un cortometraje animado 2D en el

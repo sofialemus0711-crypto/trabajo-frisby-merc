@@ -1,0 +1,2 @@
+Guarda aquí los clips generados con IA: clip_01.mp4 … clip_56.mp4 y clip_52_antes.mp4.
+Luego ejecuta: python3 produccion/montar_historia.py

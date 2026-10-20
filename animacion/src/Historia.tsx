@@ -2,6 +2,7 @@
 // se les antoja Frisby, analizan cómo se promociona y cómo les llega el pedido,
 // proponen "Frisby nos une" y terminan compartiendo la mesa con un vecino.
 import React from 'react';
+import {getInputProps} from 'remotion';
 import {D, at, fin, kf, prog, boca, hablante, osc, seg} from './anim';
 import {Personaje, PersonajeProps} from './Personaje';
 import {Fondo, Frente, PISO, Presa, Telefono, Laptop, Balde, Arepas, Vaso, Bolsa, Recibo, Afiche, Trazo, Escrito} from './Escenario';
@@ -104,7 +105,7 @@ function escena1(f: number): Cuadro {
     mundo: ruge ? <Rugido f={f} x={pos.C2} y={PISO - 150} /> : null,
     pantalla: (
       <>
-        {f < seg(4.5) && <Titulo f={f} />}
+        {f < seg(4.5) && !(getInputProps() as any).sinTexto && <Titulo f={f} />}
         <Panel f={f} desde={at(3)} hasta={at(4)} x={230} y={160} w={400} h={720}>
           <rect width={400} height={720} fill="#F2CB25" />
           <Captura src="logo_mascota.jpg" x={0} y={120} w={400} h={400} fit="meet" />
