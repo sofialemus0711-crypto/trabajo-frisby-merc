@@ -3,6 +3,31 @@
 Material de producción del video para el trabajo de **Gestión de Mercadeo**, basado
 literalmente en el guion de las ocho escenas (incluida la campaña **“Frisby nos une”**).
 
+## Versión animada (cortometraje)
+
+**`salida/Frisby_animado.mp4`** es la versión principal: un cortometraje animado 2D en el
+que las tres amigas viven la historia en su apartamento, en lugar de mostrar una imagen por
+frase. Están preparando el trabajo de mercadeo y se les antoja Frisby. Analizan en el celular
+cómo se promociona la marca, Dani lo explica en el tablero y Cami hace de vendedora mientras
+Dani la graba como creadora de contenido. Después siguen el domicilio en el mapa, reciben el
+pedido en la puerta, presentan "Frisby nos une" poniendo la mesa e invitan a un vecino que
+estaba solo. Al final cenan juntos de noche y el video cierra con el logo.
+
+- Los 56 diálogos son literales y van en orden, con una voz distinta por compañera. Las bocas
+  se mueven según la amplitud real de cada voz.
+- Hay pausas de acción sin diálogo, la cámara cambia de plano (generales, medios y primeros
+  planos) y los personajes parpadean, miran a quien habla y reaccionan.
+- Los subtítulos son pequeños y discretos, y la música va por debajo de las voces.
+- Está hecho con [Remotion](https://www.remotion.dev/) en `animacion/`. Los datos (tiempos,
+  bocas y audio) los genera `produccion/preparar_animacion.py`.
+
+```bash
+python3 produccion/preparar_animacion.py   # después de generar_voces.py
+cd animacion && npm install
+npx remotion render FrisbyAnimado ../salida/Frisby_animado.mp4 \
+  --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
+```
+
 ## Qué hay aquí
 
 | Archivo | Para qué sirve |
