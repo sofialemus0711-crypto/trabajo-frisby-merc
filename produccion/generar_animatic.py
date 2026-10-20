@@ -401,12 +401,28 @@ def main():
         sf.write(audio, mezcla, sr)
         entrada_audio = ["-i", audio]
     else:
-        entrada_audio = ["-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo"]
+        entrada_audio = ["-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono"]
+
+    # música de fondo (generar_musica.py), siempre por debajo de las voces: se
+    # atenúa automáticamente mientras alguien habla (sidechain)
+    from generar_musica import componer, SR as SR_MUSICA
+    import soundfile as sf
+    musica = os.path.join(TMP, "musica.wav")
+    sf.write(musica, componer(t), SR_MUSICA)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", musica, "-c:a", "aac", "-b:a", "160k",
+                    os.path.join(SALIDA, "musica_fondo.m4a")], check=True)
+    filtro = (
+        "[1:a]aresample=48000,pan=stereo|c0=c0|c1=c0,asplit=2[voz][sc];"
+        "[2:a]volume=0.32[m];"
+        "[m][sc]sidechaincompress=threshold=0.015:ratio=6:attack=30:release=500[mus];"
+        "[voz][mus]amix=inputs=2:normalize=0:duration=longest[a]"
+    )
 
     mp4 = os.path.join(SALIDA, "animatic_frisby.mp4")
     subprocess.run([
         "ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lista,
-        *entrada_audio, "-t", f"{t:.2f}", "-ar", "48000", "-ac", "2",
+        *entrada_audio, "-i", musica, "-filter_complex", filtro, "-map", "0:v", "-map", "[a]",
+        "-t", f"{t:.2f}", "-ar", "48000",
         "-vf", "fps=25,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
         "-tune", "stillimage", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", mp4,
     ], check=True)
