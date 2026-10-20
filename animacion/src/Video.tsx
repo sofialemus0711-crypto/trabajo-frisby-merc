@@ -30,7 +30,7 @@ const CierreLogo: React.FC<{f: number}> = ({f}) => {
   const sale = prog(f, D.total - 36, D.total);
   return (
     <AbsoluteFill style={{background: '#F2CB25', opacity: e, alignItems: 'center', justifyContent: 'center'}}>
-      <Img src={staticFile('img/logo_mascota.jpg')} style={{width: 900, height: 900, transform: `scale(${0.92 + 0.08 * e})`, maskImage: 'radial-gradient(circle, black 62%, transparent 72%)', WebkitMaskImage: 'radial-gradient(circle, black 62%, transparent 72%)'}} />
+      <Img src={staticFile('img/logo_mascota.jpg')} style={{width: 900, height: 900, transform: `scale(${0.92 + 0.08 * e})`, maskImage: 'radial-gradient(closest-side, black 86%, transparent 100%)', WebkitMaskImage: 'radial-gradient(closest-side, black 86%, transparent 100%)'}} />
       <AbsoluteFill style={{background: '#000', opacity: sale}} />
     </AbsoluteFill>
   );
